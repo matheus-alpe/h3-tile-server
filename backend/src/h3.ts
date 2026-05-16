@@ -5,7 +5,8 @@ import vtpbf from "vt-pbf";
 import {
   ZOOM_TO_H3_RESOLUTION,
   getH3CellsForTile,
-  stableValue,
+  heatValue,
+  decayKmForZoom,
 } from "./utils.js";
 import type { Feature } from "geojson";
 
@@ -25,8 +26,11 @@ export const h3TileRender = (req: Request, res: Response) => {
     return res.status(204).end();
   }
 
+  const decayKm = decayKmForZoom(z);
+
   const features: Feature[] = cells.map((cell) => {
-    const boundary = h3.cellToBoundary(cell, true); // true = geojson format
+    const boundary = h3.cellToBoundary(cell, true);
+    const [lat, lng] = h3.cellToLatLng(cell);
 
     return {
       type: "Feature",
@@ -37,9 +41,7 @@ export const h3TileRender = (req: Request, res: Response) => {
       properties: {
         h3: cell,
         resolution: h3.getResolution(cell),
-        // custom data here (value, count, etc.)
-        // deterministic so the same cell gets the same value across adjacent tiles
-        value: stableValue(cell),
+        value: heatValue(lat, lng, decayKm),
       },
     };
   });
