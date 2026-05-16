@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 const map = new maplibregl.Map({
   container: "map",
   style: "https://tiles.openfreemap.org/styles/liberty",
+  center: [-46.6333, -23.5505], // São Paulo — SP
   zoom: 11,
   pitch: 0,
   bearing: 0,
